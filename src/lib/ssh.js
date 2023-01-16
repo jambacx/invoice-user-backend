@@ -5,10 +5,11 @@ const connect = async () => {
   return await ssh
     .connect({
       // host: '172.30.199.193',
-      host: '172.30.199.209',
+      // host: '172.30.199.209',
       port: 22,
       username: 'aumpsw',
       password: 'CsJh4Ki',
+      readyTimeout: 60000
     });
 };
 

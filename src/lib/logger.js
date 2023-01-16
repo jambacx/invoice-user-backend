@@ -12,7 +12,6 @@ const logFormat = winston.format.combine(
 );
 
 const filename = path.resolve(`${process.env.logFolder || 'logs'}`, 'log_%DATE%.log');
-console.log('filename', filename);
 
 const transport = new DailyRotateFile({
   filename,
@@ -26,6 +25,7 @@ const transport = new DailyRotateFile({
 // transport.on('rotate', function (oldFilename, newFilename) {
 //   // call function like upload to s3 or on cloud
 // });
+
 const logger = winston.createLogger({
   format: logFormat,
   transports: [
@@ -35,4 +35,5 @@ const logger = winston.createLogger({
     }),
   ],
 });
+
 module.exports = logger;

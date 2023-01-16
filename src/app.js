@@ -3,11 +3,13 @@ const express = require('express');
 const createError = require('http-errors');
 const logger = require('./lib/logger');
 var cors = require('cors');
+var morgan = require('morgan');
 
 const Router = require("./Routes/All.route");
 
 const app = express();
 
+app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -25,11 +27,13 @@ app.use((req, res, next) => {
 //Error handler
 app.use((err, req, res, next) => {
   // next(createError(500, err.message || 'Unhandling Error!'));
+  const message = err.message || 'Unhandling Error!';
+  logger.error(message);
   res
     .status(err.status || 500)
     .send({
       status: err.status || 500,
-      message: err.message || 'Unhandling Error!',
+      message
     });
 });
 
