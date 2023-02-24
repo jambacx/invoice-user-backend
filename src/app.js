@@ -1,44 +1,59 @@
 require('dotenv').config();
 const express = require('express');
-const createError = require('http-errors');
+const cors = require('cors');
+const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
+const ip = require('request-ip');
+const cookieMiddleware = require('./Middlewares/Cookie.middleware');
+
 const logger = require('./lib/logger');
-var cors = require('cors');
-var morgan = require('morgan');
+const initDB = require("./initDB");
+const Routes = require("./Routes");
 
-const Router = require("./Routes/All.route");
+(async () => {
+  const app = express();
 
-const app = express();
+  app.use(morgan('dev'));
+  app.use(cors());
+  app.use(express.json());
+  app.use(cookieParser());
+  app.use(express.urlencoded({ extended: true }));
 
-app.use(morgan('dev'));
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+  // Initialize DB
+  await initDB();
 
-// Initialize DB
-// require("./initDB")();
+  // Application Level Middlewares
+  app.use(ip.mw());
+  app.use(cookieMiddleware);
 
-app.use("/api/v1", Router);
+  // Router Level Middlewares
+  app.use("/api", Routes);
 
-//404 handler and pass to error handler
-app.use((req, res, next) => {
-  next(createError(404, 'Not found'));
-});
+  //404 handler and pass to error handler
+  app.use(() => {
+    throw {
+      status: 404,
+      code: 404,
+      message: 'Not Found'
+    };
+  });
 
-//Error handler
-app.use((err, req, res, next) => {
-  // next(createError(500, err.message || 'Unhandling Error!'));
-  const message = err.message || 'Unhandling Error!';
-  logger.error(message);
-  res
-    .status(err.status || 500)
-    .send({
-      status: err.status || 500,
-      message
-    });
-});
+  //Error handler
+  app.use((err, req, res, next) => {
+    logger.debug(err.message || err);
 
-const PORT = process.env.PORT || 3000;
+    res
+      .status(err.status || 500)
+      .send({
+        code: err.code || 500,
+        message: err.message || 'Unhandling Error!',
+      });
+  });
 
-app.listen(PORT, () => {
-  logger.info('RESTful API server started on :' + PORT);
-});
+  const PORT = process.env.PORT || 3000;
+
+  app.listen(PORT, () => {
+    logger.debug('RESTful API server started on :' + PORT);
+  });
+})();
+

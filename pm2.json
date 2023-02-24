@@ -1,0 +1,11 @@
+{
+  "apps": [
+    {
+      "name": "au-mail-carrying-backend",
+      "script": "src/app.js",
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  ]
+}

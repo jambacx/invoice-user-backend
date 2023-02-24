@@ -1,38 +1,39 @@
+require('winston-daily-rotate-file');
 const winston = require('winston');
-const DailyRotateFile = require('winston-daily-rotate-file');
-const path = require('path');
+const { accessLogDir } = require('../Constants/dir');
 
-const logFormat = winston.format.combine(
-  winston.format.colorize(),
-  winston.format.timestamp(),
-  winston.format.align(),
-  winston.format.printf(
-    (info) => `${info.timestamp} ${info.level}: ${info.message}`
-  )
-);
-
-const filename = path.resolve(`${process.env.logFolder || 'logs'}`, 'log_%DATE%.log');
-
-const transport = new DailyRotateFile({
-  filename,
-  datePattern: 'YYYY-MM-DD-HH',
-  zippedArchive: true,
-  maxSize: '20m',
-  maxFiles: '14d',
+const fileTransport = new winston.transports.DailyRotateFile({
+  filename: '%DATE%.log',
+  dirname: accessLogDir,
+  datePattern: 'YYYYMMDD',
+  // zippedArchive: true,
+  // maxSize: '20m',
+  // maxFiles: '14d',
   prepend: true,
   level: 'info',
+  format: winston.format.combine(
+    winston.format.colorize(),
+    winston.format.timestamp({ format: 'YYYY-MM-DD,HH:mm:ss' }),
+    // winston.format.align(),
+    winston.format.printf(
+      (info) => `${info.timestamp},${info.message}`
+    ),
+  )
 });
-// transport.on('rotate', function (oldFilename, newFilename) {
-//   // call function like upload to s3 or on cloud
-// });
+
+const consoleTransport = new winston.transports.Console({
+  level: 'debug',
+  timestamp: false,
+  format: winston.format.combine(
+    winston.format.colorize(),
+    winston.format.simple()
+  )
+});
 
 const logger = winston.createLogger({
-  format: logFormat,
   transports: [
-    transport,
-    new winston.transports.Console({
-      level: 'info',
-    }),
+    fileTransport,
+    consoleTransport,
   ],
 });
 
