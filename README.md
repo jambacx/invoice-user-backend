@@ -13,7 +13,7 @@ The application is **production ready**, and can be used behind a Nginx reverse 
 Step 1: Clone the repo
 
 ```bash
-git clone https://gitlab.com/au-mail-carrying/backend.git
+git clone https://gitlab.com/au-invoice/backend.git
 ```
 
 Step 2: cd into the cloned repo and run:
@@ -25,11 +25,11 @@ npm install or yarn
 Step 3: Put your credentials in the .env file.
 
 ```bash
-PORT=3000
+PORT=80
 MONGODB_URI=YOUR MONGODB URI
 DB_NAME=DATABASE NAME OF YOUR CHOICE
 DB_USER=DATABASE USER
-DB_PASS=DATABASE USER PASSWORD 
+DB_PASS=DATABASE USER PASSWORD
 ```
 
 Step 4: Start the API by

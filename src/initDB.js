@@ -1,22 +1,24 @@
-const mongoose = require('mongoose');
-const logger = require('./lib/logger');
+const mongoose = require("mongoose");
+const logger = require("./lib/logger");
 
 module.exports = async () => {
-  mongoose.connection.on('connected', () => {
-    logger.debug('Mongoose connected to db...');
+  mongoose.connection.on("connected", () => {
+    logger.debug("Mongoose connected to db...");
   });
 
-  mongoose.connection.on('error', err => {
+  mongoose.connection.on("error", (err) => {
     logger.debug(err.message || err);
   });
 
-  mongoose.connection.on('disconnected', () => {
-    logger.debug('Mongoose connection is disconnected...');
+  mongoose.connection.on("disconnected", () => {
+    logger.debug("Mongoose connection is disconnected...");
   });
 
-  process.on('SIGINT', () => {
+  process.on("SIGINT", () => {
     mongoose.connection.close(() => {
-      logger.debug('Mongoose connection is disconnected due to app termination...');
+      logger.debug(
+        "Mongoose connection is disconnected due to app termination..."
+      );
       process.exit(0);
     });
   });

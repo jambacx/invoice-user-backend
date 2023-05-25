@@ -1,7 +1,7 @@
-const logger = require('./logger');
-const parser = require('./parser');
-const errorHandler = require('./error');
-const { NodeSSH } = require('node-ssh');
+const logger = require("./logger");
+const parser = require("./parser");
+const errorHandler = require("./error");
+const { NodeSSH } = require("node-ssh");
 
 const ssh = new NodeSSH();
 
@@ -19,32 +19,41 @@ const servers = {
 };
 
 const connect = async (server = servers.osaka) => {
-  return await ssh
-    .connect({
-      host: server.host,
-      username: server.username,
-      password: server.password,
-      port: 22,
-      readyTimeout: 50000
-    });
+  return await ssh.connect({
+    host: server.host,
+    username: server.username,
+    password: server.password,
+    port: 22,
+    readyTimeout: SESSION_TIME
+  });
 };
 
 const execCommand = async (options, count = 1) => {
   const req = options.req;
   const command = `${options.action} ${options.type} ${options.value} | iconv -f sjis -t utf-8`;
-  const response = await ssh.execCommand(`${process.env.SSH_DOTSH_FILE} ${command}`);
+  const response = await ssh.execCommand(
+    `${process.env.SSH_DOTSH_FILE} ${command}`
+  );
 
   if (response.stderr) {
-    logger.info(`E,${req.operatorId},${req.clientIp},${translateToJapan(options.action)},${options.value},${respCode}`);
+    logger.info(
+      `E,${req.operatorId},${req.clientIp},${translateToJapan(
+        options.action
+      )},${options.value},${respCode}`
+    );
     throw new Error(response.stderr);
   }
 
   const parsed = await parser(response.stdout);
-  const respCode = parsed['処理結果コード'];
+  const respCode = parsed["処理結果コード"];
 
-  logger.info(`I,${req.operatorId},${req.clientIp},${translateToJapan(options.action)},${options.value},${respCode}`);
+  logger.info(
+    `I,${req.operatorId},${req.clientIp},${translateToJapan(options.action)},${
+      options.value
+    },${respCode}`
+  );
 
-  if (respCode === '1106' && count === 1) {
+  if (respCode === "1106" && count === 1) {
     await connect(servers.oyama);
     return await execCommand(command, 2);
   }
@@ -55,10 +64,10 @@ const execCommand = async (options, count = 1) => {
 
 const translateToJapan = (text) => {
   return text
-    .replace('show', '検索')
-    .replace('cancel', '解約実行')
-    .replace('forcecancel', '強制解約実行')
-    .replace('rejoincon', '強制解約解除実行');
+    .replace("show", "検索")
+    .replace("cancel", "解約実行")
+    .replace("forcecancel", "強制解約実行")
+    .replace("rejoincon", "強制解約解除実行");
 };
 
 module.exports = {

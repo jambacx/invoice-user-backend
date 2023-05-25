@@ -1,22 +1,19 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const moment = require('moment');
-const { dateFormat } = require('../Constants/format');
+const moment = require("moment");
+const { dateFormat } = require("../Constants/format");
 
-router.get('/', (req, res) => {
-  res
-    .status(200)
-    .send({
-      alive: true
-    });
+router.get("/", (req, res) => {
+  res.status(200).send({
+    alive: true
+  });
 });
 
-router.get('/test', async (req, res, next) => {
+router.get("/test", async (req, res, next) => {
   try {
-    const Log = require('../Models/AccessLog.model');
-    const date = moment().subtract(1, 'day').format(dateFormat);
+    const Log = require("../Models/AccessLog.model");
+    const date = moment().subtract(1, "day").format(dateFormat);
     const sum = await Log.accessByAuId(date);
-    console.log("aaaaa", sum);
 
     const logs = await Log.LogModel.find();
 
@@ -26,8 +23,7 @@ router.get('/test', async (req, res, next) => {
   }
 });
 
-router.use('/user', require('./User.route'));
-router.use('/archive', require('./Archive.route'));
-router.use('/analytic', require('./Analytic.route'));
+router.use("/user", require("./User.route"));
+router.use("/", require("./Invoice.route"));
 
 module.exports = router;

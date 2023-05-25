@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "name": "au-mail-carrying-backend",
+      "name": "au-invoice-backend",
       "script": "src/app.js",
       "env": {
         "NODE_ENV": "production"

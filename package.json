@@ -1,7 +1,7 @@
 {
-  "name": "au-mail-carrying",
+  "name": "au-invoice",
   "version": "1.0.9",
-  "description": "au mail carrying",
+  "description": "au-invoice",
   "main": "./src/app.js",
   "scripts": {
     "start": "node ./src/app.js",
@@ -18,6 +18,9 @@
     "express-validator": "^6.14.2",
     "glob": "^8.1.0",
     "http-errors": "^1.7.3",
+    "joi": "^17.9.1",
+    "joi-objectid": "^4.0.2",
+    "json2csv": "^6.0.0-alpha.2",
     "moment": "^2.29.4",
     "mongoose": "^5.7.13",
     "morgan": "^1.10.0",
