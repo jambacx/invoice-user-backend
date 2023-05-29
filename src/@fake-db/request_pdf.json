@@ -3,337 +3,288 @@
     "invoiceId": 2023010001,
     "billingYear": 2023,
     "billingMonth": 1,
-    "invoiceStatus": 1,
     "issuedTime": "2023-01-15T13:00:00Z"
   },
   {
     "invoiceId": 2023020002,
     "billingYear": 2023,
     "billingMonth": 2,
-    "invoiceStatus": 0,
     "issuedTime": "2023-02-16T13:00:00Z"
   },
   {
-    "invoiceId": 2023030003,
+    "invoiceId": null,
     "billingYear": 2023,
     "billingMonth": 3,
-    "invoiceStatus": 2,
-    "issuedTime": "2023-03-15T13:00:00Z"
+    "issuedTime": null
   },
   {
     "invoiceId": 2023040004,
     "billingYear": 2023,
     "billingMonth": 4,
-    "invoiceStatus": 1,
     "issuedTime": "2023-04-15T13:00:00Z"
   },
   {
-    "invoiceId": 2023050005,
+    "invoiceId": null,
     "billingYear": 2023,
     "billingMonth": 5,
-    "invoiceStatus": 1,
-    "issuedTime": "2023-05-15T13:00:00Z"
+    "issuedTime": null
   },
   {
     "invoiceId": 2023060006,
     "billingYear": 2023,
     "billingMonth": 6,
-    "invoiceStatus": 0,
     "issuedTime": "2023-06-16T13:00:00Z"
   },
   {
     "invoiceId": 2023070007,
     "billingYear": 2023,
     "billingMonth": 7,
-    "invoiceStatus": 2,
     "issuedTime": "2023-07-15T13:00:00Z"
   },
   {
     "invoiceId": 2023080008,
     "billingYear": 2023,
     "billingMonth": 8,
-    "invoiceStatus": 1,
     "issuedTime": "2023-08-15T13:00:00Z"
   },
   {
     "invoiceId": 2023090009,
     "billingYear": 2023,
     "billingMonth": 9,
-    "invoiceStatus": 1,
     "issuedTime": "2023-09-15T13:00:00Z"
   },
   {
     "invoiceId": 2023100010,
     "billingYear": 2023,
     "billingMonth": 10,
-    "invoiceStatus": 0,
     "issuedTime": "2023-10-16T13:00:00Z"
   },
   {
     "invoiceId": 2023110011,
     "billingYear": 2023,
     "billingMonth": 11,
-    "invoiceStatus": 2,
     "issuedTime": "2023-11-15T13:00:00Z"
   },
   {
     "invoiceId": 2023120012,
     "billingYear": 2023,
     "billingMonth": 12,
-    "invoiceStatus": 1,
     "issuedTime": "2023-12-15T13:00:00Z"
   },
   {
     "invoiceId": 2024010025,
     "billingYear": 2024,
     "billingMonth": 1,
-    "invoiceStatus": 1,
     "issuedTime": "2024-01-15T13:00:00Z"
   },
   {
     "invoiceId": 2024020028,
     "billingYear": 2024,
     "billingMonth": 2,
-    "invoiceStatus": 0,
     "issuedTime": "2024-02-16T13:00:00Z"
   },
   {
     "invoiceId": 2024030031,
     "billingYear": 2024,
     "billingMonth": 3,
-    "invoiceStatus": 2,
     "issuedTime": "2024-03-15T13:00:00Z"
   },
   {
-    "invoiceId": 2024040032,
+    "invoiceId": null,
     "billingYear": 2024,
     "billingMonth": 4,
-    "invoiceStatus": 1,
-    "issuedTime": "2024-04-15T13:00:00Z"
+    "issuedTime": null
   },
   {
     "invoiceId": 2024050033,
     "billingYear": 2024,
     "billingMonth": 5,
-    "invoiceStatus": 1,
     "issuedTime": "2024-05-15T13:00:00Z"
   },
   {
-    "invoiceId": 2024060034,
+    "invoiceId": null,
     "billingYear": 2024,
     "billingMonth": 6,
-    "invoiceStatus": 0,
-    "issuedTime": "2024-06-16T13:00:00Z"
+    "issuedTime": null
   },
   {
     "invoiceId": 2024070036,
     "billingYear": 2024,
     "billingMonth": 7,
-    "invoiceStatus": 2,
     "issuedTime": "2024-07-15T13:00:00Z"
   },
   {
     "invoiceId": 2024080037,
     "billingYear": 2024,
     "billingMonth": 8,
-    "invoiceStatus": 1,
     "issuedTime": "2024-08-15T13:00:00Z"
   },
   {
     "invoiceId": 2024090040,
     "billingYear": 2024,
     "billingMonth": 9,
-    "invoiceStatus": 1,
     "issuedTime": "2024-09-15T13:00:00Z"
   },
   {
     "invoiceId": 2024100041,
     "billingYear": 2024,
     "billingMonth": 10,
-    "invoiceStatus": 0,
     "issuedTime": "2024-10-16T13:00:00Z"
   },
   {
     "invoiceId": 2024110043,
     "billingYear": 2024,
     "billingMonth": 11,
-    "invoiceStatus": 2,
     "issuedTime": "2024-11-15T13:00:00Z"
   },
   {
     "invoiceId": 2024120045,
     "billingYear": 2024,
     "billingMonth": 12,
-    "invoiceStatus": 1,
     "issuedTime": "2024-12-15T13:00:00Z"
   },
-
   {
     "invoiceId": 2025010025,
     "billingYear": 2025,
     "billingMonth": 1,
-    "invoiceStatus": 1,
     "issuedTime": "2025-01-15T13:00:00Z"
   },
   {
     "invoiceId": 2025020028,
     "billingYear": 2025,
     "billingMonth": 2,
-    "invoiceStatus": 0,
     "issuedTime": "2025-02-16T13:00:00Z"
   },
   {
     "invoiceId": 2025030031,
     "billingYear": 2025,
     "billingMonth": 3,
-    "invoiceStatus": 0,
     "issuedTime": "2025-03-15T13:00:00Z"
   },
   {
     "invoiceId": 2025040032,
     "billingYear": 2025,
     "billingMonth": 4,
-    "invoiceStatus": 0,
     "issuedTime": "2025-04-15T13:00:00Z"
   },
   {
     "invoiceId": 2025050033,
     "billingYear": 2025,
     "billingMonth": 5,
-    "invoiceStatus": 0,
     "issuedTime": "2025-05-15T13:00:00Z"
   },
   {
     "invoiceId": 2025060034,
     "billingYear": 2025,
     "billingMonth": 6,
-    "invoiceStatus": 0,
     "issuedTime": "2025-06-16T13:00:00Z"
   },
   {
     "invoiceId": 2025070036,
     "billingYear": 2025,
     "billingMonth": 7,
-    "invoiceStatus": 0,
     "issuedTime": "2025-07-15T13:00:00Z"
   },
   {
     "invoiceId": 2025080037,
     "billingYear": 2025,
     "billingMonth": 8,
-    "invoiceStatus": 0,
     "issuedTime": "2025-08-15T13:00:00Z"
   },
   {
     "invoiceId": 2025090040,
     "billingYear": 2025,
     "billingMonth": 9,
-    "invoiceStatus": 0,
     "issuedTime": "2025-09-15T13:00:00Z"
   },
   {
     "invoiceId": 2025100041,
     "billingYear": 2025,
     "billingMonth": 10,
-    "invoiceStatus": 0,
     "issuedTime": "2025-10-16T13:00:00Z"
   },
   {
     "invoiceId": 2025110043,
     "billingYear": 2025,
     "billingMonth": 11,
-    "invoiceStatus": 0,
     "issuedTime": "2025-11-15T13:00:00Z"
   },
   {
     "invoiceId": 2025120045,
     "billingYear": 2025,
     "billingMonth": 12,
-    "invoiceStatus": 0,
     "issuedTime": "2025-12-15T13:00:00Z"
   },
   {
     "invoiceId": 2026010050,
     "billingYear": 2026,
     "billingMonth": 1,
-    "invoiceStatus": 0,
     "issuedTime": "2026-01-15T13:00:00Z"
   },
   {
     "invoiceId": 2026020053,
     "billingYear": 2026,
     "billingMonth": 2,
-    "invoiceStatus": 0,
     "issuedTime": "2026-02-16T13:00:00Z"
   },
   {
     "invoiceId": 2026030056,
     "billingYear": 2026,
     "billingMonth": 3,
-    "invoiceStatus": 0,
     "issuedTime": "2026-03-15T13:00:00Z"
   },
   {
     "invoiceId": 2026040059,
     "billingYear": 2026,
     "billingMonth": 4,
-    "invoiceStatus": 1,
     "issuedTime": "2026-04-15T13:00:00Z"
   },
   {
     "invoiceId": 2026050062,
     "billingYear": 2026,
     "billingMonth": 5,
-    "invoiceStatus": 1,
     "issuedTime": "2026-05-15T13:00:00Z"
   },
   {
     "invoiceId": 2026060065,
     "billingYear": 2026,
     "billingMonth": 6,
-    "invoiceStatus": 0,
     "issuedTime": "2026-06-16T13:00:00Z"
   },
   {
     "invoiceId": 2026070068,
     "billingYear": 2026,
     "billingMonth": 7,
-    "invoiceStatus": 2,
     "issuedTime": "2026-07-15T13:00:00Z"
   },
   {
     "invoiceId": 2026080071,
     "billingYear": 2026,
     "billingMonth": 8,
-    "invoiceStatus": 1,
     "issuedTime": "2026-08-15T13:00:00Z"
   },
   {
     "invoiceId": 2026090074,
     "billingYear": 2026,
     "billingMonth": 9,
-    "invoiceStatus": 1,
     "issuedTime": "2026-09-15T13:00:00Z"
   },
   {
     "invoiceId": 2026100077,
     "billingYear": 2026,
     "billingMonth": 10,
-    "invoiceStatus": 0,
     "issuedTime": "2026-10-16T13:00:00Z"
   },
   {
     "invoiceId": 2026110080,
     "billingYear": 2026,
     "billingMonth": 11,
-    "invoiceStatus": 2,
     "issuedTime": "2026-11-15T13:00:00Z"
   },
   {
     "invoiceId": 2026120083,
     "billingYear": 2026,
     "billingMonth": 12,
-    "invoiceStatus": 1,
     "issuedTime": "2026-12-15T13:00:00Z"
   }
 ]

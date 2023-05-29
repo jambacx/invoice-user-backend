@@ -1,0 +1,44 @@
+[
+  {
+    "invoiceId": 2023010001,
+    "settlementInfoNo": "1000012345",
+    "systemAuId": "1258",
+    "customerName": "株式会社サンプル",
+    "salesConfirmationDate": "2023-04-15",
+    "amountExcludingTax": 300,
+    "amountIncludingTax": 330,
+    "webPublicationStatus": 1,
+    "firstWebPublicationDate": "2023-05-05",
+    "updateFlag": 0,
+    "updateDate": "",
+    "previousAmountIncludingTax": ""
+  },
+  {
+    "invoiceId": 2023010002,
+    "settlementInfoNo": "1000012346",
+    "systemAuId": "1279",
+    "customerName": "サンプル合同会社",
+    "salesConfirmationDate": "2023-04-20",
+    "amountExcludingTax": 500,
+    "amountIncludingTax": 550,
+    "webPublicationStatus": 0,
+    "firstWebPublicationDate": "",
+    "updateFlag": 1,
+    "updateDate": "2023-05-10",
+    "previousAmountIncludingTax": 550
+  },
+  {
+    "invoiceId": 2023010003,
+    "settlementInfoNo": "1000012347",
+    "systemAuId": "1230",
+    "customerName": "サンプル有限会社",
+    "salesConfirmationDate": "2023-05-05",
+    "amountExcludingTax": 800,
+    "amountIncludingTax": 880,
+    "webPublicationStatus": 1,
+    "firstWebPublicationDate": "2023-05-15",
+    "updateFlag": 0,
+    "updateDate": "",
+    "previousAmountIncludingTax": ""
+  }
+]
