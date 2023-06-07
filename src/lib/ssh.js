@@ -9,13 +9,13 @@ const servers = {
   osaka: {
     host: process.env.AIR_OSAKA_HOST,
     username: process.env.AIR_OSAKA_USERNAME,
-    password: process.env.AIR_OSAKA_PASSWORD
+    password: process.env.AIR_OSAKA_PASSWORD,
   },
   oyama: {
     host: process.env.AIR_OYAMA_HOST,
     username: process.env.AIR_OYAMA_USERNAME,
-    password: process.env.AIR_OYAMA_PASSWORD
-  }
+    password: process.env.AIR_OYAMA_PASSWORD,
+  },
 };
 
 const connect = async (server = servers.osaka) => {
@@ -24,8 +24,32 @@ const connect = async (server = servers.osaka) => {
     username: server.username,
     password: server.password,
     port: 22,
-    readyTimeout: SESSION_TIME
+    readyTimeout: 150000,
   });
+};
+
+const sendEmail = async (options, count = 1) => {
+  const command = `/opt/aumpsw/kddi/bin/invoice_passwd_reset_url_send.sh ${options.email} ${options.link}`;
+  const response = await ssh.execCommand(
+    `${process.env.SSH_DOTSH_FILE} ${command}`
+  );
+
+  if (response.code === 0) {
+    // error Log end bichne yamar response ireheer hamaarna
+    // logger.info(
+    //   `E,${req.operatorId},${req.clientIp},${translateToJapan(
+    //     options.action
+    //   )},${options.value},${respCode}`
+    // );
+    // throw new Error(response.stderr);
+  }
+
+  if (response.code === 0 && count === 1) {
+    await connect(servers.oyama);
+    return await sendEmail(command, 2);
+  }
+
+  return response.code;
 };
 
 const execCommand = async (options, count = 1) => {
@@ -72,5 +96,6 @@ const translateToJapan = (text) => {
 
 module.exports = {
   connect,
-  execCommand
+  execCommand,
+  sendEmail,
 };

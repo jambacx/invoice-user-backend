@@ -7,17 +7,18 @@ const ip = require("request-ip");
 const cookieMiddleware = require("./Middlewares/Cookie.middleware");
 
 const logger = require("./lib/logger");
-// const initDB = require("./initDB");
+const initDB = require("./initDB");
 const Routes = require("./Routes");
-
 (async () => {
   const app = express();
-
   app.use(morgan("dev"));
   app.use(cors());
   app.use(express.json());
   app.use(cookieParser());
   app.use(express.urlencoded({ extended: true }));
+
+  // Initialize DB
+  await initDB();
 
   app.use(ip.mw());
   app.use(cookieMiddleware);
@@ -30,17 +31,16 @@ const Routes = require("./Routes");
     throw {
       status: 404,
       code: 404,
-      message: "Not Found"
+      message: "Not Found",
     };
   });
 
   //Error handler
   app.use((err, req, res, next) => {
     logger.debug(err.message || err);
-
-    res.status(err.status || 500).send({
-      code: err.code || 500,
-      message: err.message || "Unhandling Error!"
+    res.status(err.status || err.statusCode || 500).send({
+      code: err.code || err.statusCode || 500,
+      message: err.message || "Unhandling Error!",
     });
   });
 
