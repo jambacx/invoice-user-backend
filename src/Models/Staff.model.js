@@ -34,7 +34,7 @@ const StaffSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    minlength: 4,
+    minlength: 8,
     required: [true, "Enter staff password"],
     select: false,
   },

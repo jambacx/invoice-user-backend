@@ -6,6 +6,12 @@ const crypto = require("crypto");
 
 exports.register = async (req, res, next) => {
   try {
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@#?]).{8,}$/;
+
+    if (!passwordRegex.test(req.body.password)) {
+      throw new CustomError("password is not valid", 400);
+    }
+
     const staff = await Staff.create(req.body);
     const token = staff.getJsonWebToken();
     await staff.isChangePassword(req.body.password);
