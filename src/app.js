@@ -46,6 +46,8 @@ const Routes = require("./Routes");
 
   const PORT = process.env.PORT || 80;
 
+  console.log("PORT: ", PORT);
+
   app.listen(PORT, () => {
     logger.debug("RESTful API server started on :" + PORT);
   });
