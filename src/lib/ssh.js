@@ -29,7 +29,8 @@ const connect = async (server = servers.osaka) => {
 };
 
 const sendEmail = async (options, count = 1) => {
-  const command = `/opt/aumpsw/kddi/bin/invoice_passwd_reset_url_send.sh ${options.email} ${options.link}`;
+  const command = `${options.email} ${options.link}`;
+  // SSH_DOTSH_FILE=/opt/aumpsw/kddi/bin/invoice_passwd_reset_url_send.sh
   const response = await ssh.execCommand(
     `${process.env.SSH_DOTSH_FILE} ${command}`
   );

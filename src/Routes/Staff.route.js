@@ -4,7 +4,7 @@ const {
   login,
   getStaffs,
   getStaff,
-  createUser,
+  changePassword,
   updateUser,
   deleteUser,
   forgotPassword,
@@ -23,6 +23,9 @@ router.route("/reset-password").post(resetPassword);
 router.use(checkAuth);
 
 //api/users
+router
+  .route("/change-password")
+  .post(checkRole("administrator", "general"), changePassword);
 router.route("/").get(checkRole("administrator"), getStaffs);
 router
   .route("/:id")

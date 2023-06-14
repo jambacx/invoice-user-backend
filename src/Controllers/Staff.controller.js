@@ -158,6 +158,40 @@ exports.resetPassword = async (req, res, next) => {
   }
 };
 
+exports.changePassword = async (req, res, next) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    if (!oldPassword || !newPassword) {
+      throw new CustomError("Please insert a old and new password", 400);
+    }
+
+    const staff = await Staff.findById(req.userId)
+      .select("+prevPasswords")
+      .select("+password");
+
+    if (!staff) {
+      throw new CustomError("User not found", 400);
+    }
+
+    const checkPassword = await staff.checkPassword(oldPassword);
+    if (!checkPassword) {
+      throw new CustomError("your old password is wrong", 401);
+    }
+
+    const isChangePassword = await staff.isChangePassword(newPassword);
+
+    if (!isChangePassword) {
+      throw new CustomError("Previous used password", 400);
+    }
+    staff.password = newPassword;
+    await staff.save();
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.getStaff = async (req, res, next) => {
   try {
     const staff = await Staff.findById(req.params.id);
