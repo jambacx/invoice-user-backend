@@ -41,9 +41,19 @@ const StaffSchema = new mongoose.Schema({
   passwordExpire: Date,
   resetPasswordToken: String,
   resetPasswordExpire: Date,
+  setPasswordToken: String,
+  setPasswordTokenExpire: Date,
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  isLocked: {
+    type: Boolean,
+    default: false,
+  },
+  loginAttempts: {
+    type: Number,
+    default: 0,
   },
 });
 
@@ -102,6 +112,16 @@ StaffSchema.methods.generatePasswordChangeToken = function () {
     .update(resetToken)
     .digest("hex");
   this.resetPasswordExpire = Date.now() + 30 * 60 * 1000;
+  return resetToken;
+};
+
+StaffSchema.methods.generatePasswordSetToken = function () {
+  const resetToken = crypto.randomBytes(20).toString("hex");
+  this.setPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+  this.setPasswordTokenExpire = Date.now() + 30 * 60 * 1000;
   return resetToken;
 };
 

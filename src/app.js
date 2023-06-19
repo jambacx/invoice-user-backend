@@ -38,9 +38,16 @@ const Routes = require("./Routes");
   //Error handler
   app.use((err, req, res, next) => {
     logger.debug(err.message || err);
+
+    if (err.code === 11000) {
+      err.message = "duplicate key error collection";
+      err.statusCode = 400;
+    }
+
     res.status(err.status || err.statusCode || 500).send({
       code: err.code || err.statusCode || 500,
       message: err.message || "Unhandling Error!",
+      errorCode: err.errorCode,
     });
   });
 
