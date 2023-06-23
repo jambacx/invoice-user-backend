@@ -28,31 +28,6 @@ const connect = async (server = servers.osaka) => {
   });
 };
 
-const sendEmail = async (options, count = 1) => {
-  const command = `${options.email} ${options.link}`;
-  // SSH_DOTSH_FILE=/opt/aumpsw/kddi/bin/invoice_passwd_reset_url_send.sh
-  const response = await ssh.execCommand(
-    `${process.env.SSH_DOTSH_FILE} ${command}`
-  );
-
-  if (response.code === 0) {
-    // error Log end bichne yamar response ireheer hamaarna
-    // logger.info(
-    //   `E,${req.operatorId},${req.clientIp},${translateToJapan(
-    //     options.action
-    //   )},${options.value},${respCode}`
-    // );
-    // throw new Error(response.stderr);
-  }
-
-  if (response.code === 0 && count === 1) {
-    await connect(servers.oyama);
-    return await sendEmail(command, 2);
-  }
-
-  return response.code;
-};
-
 const execCommand = async (options, count = 1) => {
   const req = options.req;
   const command = `${options.action} ${options.type} ${options.value} | iconv -f sjis -t utf-8`;
@@ -98,5 +73,4 @@ const translateToJapan = (text) => {
 module.exports = {
   connect,
   execCommand,
-  sendEmail,
 };

@@ -25,6 +25,5 @@ router.get("/test", async (req, res, next) => {
 
 router.use("/user", require("./User.route"));
 router.use("/", require("./Invoice.route"));
-router.use("/staffs", require("./Staff.route"));
 
 module.exports = router;
