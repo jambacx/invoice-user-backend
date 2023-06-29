@@ -9,6 +9,4 @@ router.post("/invoices", controller.postInvoice);
 
 router.get("/invoices/pdf", controller.getInvoicePdf);
 
-router.get("/invoices/csv", controller.getInvoiceCsv);
-
 module.exports = router;

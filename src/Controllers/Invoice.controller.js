@@ -177,11 +177,8 @@ const getInvoicePdf = async (req, res) => {
   }
 };
 
-
-
 module.exports = {
   getInvoices,
   getInvoicePdf,
-  getInvoiceCsv,
   postInvoice
 };
