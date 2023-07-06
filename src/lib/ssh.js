@@ -20,11 +20,11 @@ const servers = {
 
 const connect = async (server = servers.osaka) => {
   return await ssh.connect({
-    host: server.host,
+    host: server,
     username: server.username,
     password: server.password,
-    port: 22,
-    readyTimeout: 150000,
+    port: 11080,
+    readyTimeout: process.env.SESSION_TIME
   });
 };
 

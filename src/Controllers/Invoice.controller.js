@@ -5,7 +5,8 @@ const listCsv = require("../@fake-db/request_csv.json");
 const PDFDocument = require("pdfkit");
 const { createObjectCsvStringifier } = require("csv-writer");
 const fs = require("fs");
-const { faker } = require("@faker-js/faker");
+const axios = require("axios");
+const ssh = require("../lib/ssh");
 
 const INVOICE_FIELDS = [
   "請求書NO.",
@@ -27,228 +28,157 @@ const csvStringifier = createObjectCsvStringifier({
   alwaysQuote: true
 });
 
-const getInvoices = (req, res) => {
+const baseURL = process.env.AIR_SERVER || "http://172.30.155.46:11080";
+const headerHost = process.env.HOST_HEADER || "172.30.155.46";
+
+const endpointPath = "/invoices";
+
+const getInvoices = async (req, res) => {
+  const startTime = new Date();
+  console.log(
+    `[${startTime.toISOString()}] - Incoming request to get invoices with parameters: `,
+    req.query
+  );
+
   try {
     const { serviceId, systemAuId, startDate, endDate } = req.query;
-    let filteredInvoices = invoices;
-
-    if (serviceId) {
-      filteredInvoices = filteredInvoices.filter(
-        (invoice) => invoice.serviceId === serviceId
-      );
-    }
-
-    if (systemAuId) {
-      filteredInvoices = filteredInvoices.filter(
-        (invoice) => invoice.systemAuId === systemAuId
-      );
-    }
-
-    if (startDate || endDate) {
-      filteredInvoices = filteredInvoices.filter((invoice) => {
-        const issuedDate = new Date(invoice.issuedTime);
-        const issuedYearMonth =
-          issuedDate.getFullYear() * 100 + issuedDate.getMonth();
-
-        if (startDate) {
-          const startDateObj = new Date(startDate);
-          const startYearMonth =
-            startDateObj.getFullYear() * 100 + startDateObj.getMonth();
-          if (startYearMonth > issuedYearMonth) {
-            return false;
-          }
-        }
-
-        if (endDate) {
-          const endDateObj = new Date(endDate);
-          const endYearMonth =
-            endDateObj.getFullYear() * 100 + endDateObj.getMonth();
-          if (endYearMonth < issuedYearMonth) {
-            return false;
-          }
-        }
-
-        return true;
-      });
-    }
-
-    filteredInvoices.sort((a, b) => {
-      const dateA = new Date(a.issuedTime);
-      const dateB = new Date(b.issuedTime);
-
-      // this will sort in descending order
-      return dateB - dateA;
+    const response = await axios.get(`${baseURL}${endpointPath}`, {
+      params: {
+        serviceId,
+        systemAuId,
+        startDate,
+        endDate
+      },
+      headers: {
+        Host: headerHost,
+        "Accept-Charset": "UTF-8"
+      }
     });
 
-    res.status(200).json(filteredInvoices);
+    const endTime = new Date();
+
+    console.log(
+      `[${endTime.toISOString()}] - Successfully fetched invoices. Response time: ${
+        endTime - startTime
+      }ms`
+    );
+
+    res.status(200).json(response?.data);
   } catch (error) {
-    console.error(error);
+    const endTime = new Date();
+
+    console.error(`Response time: ${endTime - startTime}ms`);
+    console.error("error: ", error);
     res.status(500).json({ message: "Error getting invoices" });
   }
 };
 
 const postInvoice = async (req, res) => {
   try {
-    const { invoiceList } = req.body;
-    let filteredInvoices = invoiceList.map((reqInvoice) => {
-      return listInvoice.find(
-        (invoice) =>
-          invoice.billingYear === reqInvoice.billingYear &&
-          invoice.billingMonth === reqInvoice.billingMonth
-      );
-    });
+    const { serviceId, systemAuId, invoiceList } = req.body;
 
-    filteredInvoices = filteredInvoices.map((invoice, index) => {
-      console.log("invoice: ", invoice);
-      if (!invoice) {
-        return {
-          invoiceId: null,
-          billingYear: invoiceList[index].billingYear,
-          billingMonth: invoiceList[index].billingMonth,
-          issuedTime: null
-        };
-      }
-      return invoice;
-    });
+    // Validate the request data
+    if (
+      typeof serviceId === "undefined" ||
+      typeof systemAuId === "undefined" ||
+      !Array.isArray(invoiceList)
+    ) {
+      return res.status(400).json({ message: "Invalid request data" });
+    }
 
-    res.status(201).json({
-      header: {
-        reasoncode: 0,
-        message: "success"
+    // Make a POST request to the external service
+    const response = await axios.post(
+      `${baseURL}${endpointPath}`,
+      {
+        serviceId,
+        systemAuId,
+        invoiceList
       },
-      body: {
-        invoiceList: filteredInvoices
+      {
+        headers: {
+          Host: headerHost,
+          "Accept-Charset": "UTF-8",
+          "Content-Type": "application/json; charset=UTF-8"
+        }
       }
-    });
+    );
+
+    if (response?.status === 200) {
+      return res.status(201).json(response?.data);
+    } else {
+      return res.status(500).json({
+        message: "Error from external service"
+      });
+    }
   } catch (error) {
-    res.status(500).json({ message: "Error creating invoice" });
+    return res.status(500).json({ message: "Error checking invoice" });
   }
 };
 
 const getInvoicePdf = async (req, res) => {
   try {
-    const { invoiceId } = req.query;
-    const invoiceIdNumber = parseInt(invoiceId, 10);
+    const { serviceId, systemAuId, invoiceId } = req.query;
 
-    const invoice = invoices.find(
-      (invoice) => invoiceIdNumber === invoice.invoiceId
-    );
-
-    if (!invoice) {
-      res.status(404).json({ message: "Invoice not found" });
-      return;
+    // Validate input parameters
+    if (!serviceId || !systemAuId || !invoiceId || isNaN(invoiceId)) {
+      return res.status(400).json({
+        header: {
+          reasoncode: 1,
+          message: "Invalid request parameters"
+        }
+      });
     }
 
-    const doc = new PDFDocument();
-    doc.pipe(res);
-    doc
-      .fontSize(25)
-      .text(`Invoice ID: ${invoice.invoiceId}`, 50, 50)
-      .moveDown()
-      .fontSize(20)
-      .text(`Billing Year: ${invoice.billingYear}`)
-      .moveDown()
-      .text(`Billing Month: ${invoice.billingMonth}`)
-      .moveDown()
-      .text(`Issued Time: ${invoice.issuedTime}`);
-    doc.end();
-
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename="invoice_${invoice.invoiceId}.pdf"`
-    );
-  } catch (error) {
-    res.status(500).json({ message: "Error generating invoice PDF" });
-  }
-};
-
-const getInvoiceCsv = async (req, res) => {
-  try {
-    const { systemAuId, startDate, endDate, businessName } = req.query;
-
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    const invoices = listCsv.filter((invoice) => {
-      const salesDate = new Date(invoice.salesConfirmationDate);
-      return (
-        invoice.systemAuId === systemAuId &&
-        salesDate >= start &&
-        salesDate <= end &&
-        invoice.customerName === businessName
-      );
+    // Make a GET request to the external service
+    const response = await axios.get(`${baseURL}/invoices/pdf`, {
+      params: {
+        serviceId,
+        systemAuId,
+        invoiceId,
+        limit: 500
+      },
+      headers: {
+        Host: headerHost,
+        "Accept-Charset": "UTF-8"
+      },
+      responseType: "stream"
     });
 
-    const faker = new Faker();
+    // Forward the response from the external service to the client
+    if (response.status === 200) {
+      res.setHeader("Content-Type", response.headers["content-type"]);
 
-    const generateRandomData = (count) => {
-      const data = [];
-      for (let i = 0; i < count; i++) {
-        const invoice = {
-          invoiceNo: faker
-            .randomNumber({ min: 1000000000, max: 9999999999 })
-            .toString(),
-          settlementInfoNo: faker
-            .randomNumber({ min: 1000000000, max: 9999999999 })
-            .toString(),
-          systemAuId: faker.randomNumber({ min: 1000, max: 9999 }).toString(),
-          customerName: faker.company.companyName(),
-          salesConfirmationDate: faker.date
-            .between("2023-04-01", "2023-06-30")
-            .toLocaleDateString(),
-          amountExcludingTax: faker.randomNumber({ min: 1, max: 100 }),
-          amountIncludingTax: faker.randomNumber({ min: 1, max: 100 }),
-          webPublicationStatus: faker.randomNumber({ min: 0, max: 1 }),
-          firstWebPublicationDate: "",
-          updateFlag: faker.randomNumber({ min: 0, max: 1 }),
-          updateDate: faker.date.past().toLocaleDateString(),
-          previousAmountIncludingTax: faker.randomNumber({ min: 1, max: 100 })
-        };
-        data.push(invoice);
+      // Forward content-disposition headers if present
+      if (response.headers["content-disposition"]) {
+        res.setHeader(
+          "Content-Disposition",
+          response.headers["content-disposition"]
+        );
       }
-      return data;
-    };
 
-    const randomData = generateRandomData(12000);
-    const jsonData = JSON.stringify(randomData, null, 2);
-
-    fs.writeFileSync("randomData.json", jsonData);
-
-    if (invoices.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No invoices found for the specified parameters" });
+      // Pipe the stream to the client
+      response.data.pipe(res);
+    } else {
+      return res.status(500).json({
+        header: {
+          reasoncode: 1,
+          message: "Error from external service"
+        }
+      });
     }
-
-    const csvData = invoices.map((invoice) => ({
-      "請求書NO.": invoice.invoiceNo,
-      決済情報番号: invoice.settlementInfoNo,
-      システムauID: invoice.systemAuId,
-      顧客氏名: invoice.customerName,
-      売上確定年月日: invoice.salesConfirmationDate,
-      "金額（税抜）": invoice.amountExcludingTax,
-      "金額（税込）": invoice.amountIncludingTax,
-      WEB発行有無: invoice.webPublicationStatus,
-      WEB初回発行日時: invoice.firstWebPublicationDate,
-      更新フラグ: invoice.updateFlag,
-      更新日: invoice.updateDate,
-      "更新前金額（税込）": invoice.previousAmountIncludingTax
-    }));
-
-    const csv = csvStringifier.stringifyRecords(csvData);
-    const csvWithBom = "\uFEFF" + csv;
-    res.setHeader("Content-Type", "text/csv; charset=UTF-8");
-    res.status(200).send(csvWithBom);
   } catch (error) {
-    console.error("Error generating invoice CSV", error);
-    res.status(500).json({ message: "Error generating invoice CSV" });
+    console.error(error);
+    return res.status(500).json({
+      header: {
+        reasoncode: 1,
+        message: "Error generating invoice PDF"
+      }
+    });
   }
 };
 
 module.exports = {
   getInvoices,
   getInvoicePdf,
-  getInvoiceCsv,
   postInvoice
 };
