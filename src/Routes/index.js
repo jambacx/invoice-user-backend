@@ -25,5 +25,7 @@ router.get("/test", async (req, res, next) => {
 
 router.use("/user", require("./User.route"));
 router.use("/", require("./Invoice.route"));
+router.use("/archive", require("./Archive.route"));
+router.use("/analytic", require("./Analytic.route"));
 
 module.exports = router;
