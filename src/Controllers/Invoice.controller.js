@@ -1,32 +1,6 @@
-const { Parser } = require("json2csv");
-const invoices = require("../@fake-db/billing_month.json");
-const listInvoice = require("../@fake-db/invoicing_list.json");
-const listCsv = require("../@fake-db/request_csv.json");
-const PDFDocument = require("pdfkit");
-const { createObjectCsvStringifier } = require("csv-writer");
-const fs = require("fs");
 const axios = require("axios");
-const ssh = require("../lib/ssh");
-
-const INVOICE_FIELDS = [
-  "請求書NO.",
-  "決済情報番号",
-  "システムauID",
-  "顧客氏名",
-  "売上確定年月日",
-  "金額（税抜）",
-  "金額（税込）",
-  "WEB発行有無",
-  "WEB初回発行日時",
-  "更新フラグ",
-  "更新日",
-  "更新前金額（税込）"
-];
-
-const csvStringifier = createObjectCsvStringifier({
-  header: INVOICE_FIELDS.map((field) => ({ id: field, title: field })),
-  alwaysQuote: true
-});
+const logger = require("../lib/logger");
+const qs = require("qs");
 
 const baseURL = process.env.AIR_SERVER || "http://172.30.155.46:11080";
 const headerHost = process.env.HOST_HEADER || "172.30.155.46";
@@ -35,9 +9,10 @@ const endpointPath = "/invoices";
 
 const getInvoices = async (req, res) => {
   const startTime = new Date();
-  console.log(
-    `[${startTime.toISOString()}] - Incoming request to get invoices with parameters: `,
-    req.query
+  logger.info(
+    `[${startTime.toISOString()}] - 請求書の情報取得要求を受け取りました。パラメータ：${JSON.stringify(
+      req.query
+    )}`
   );
 
   try {
@@ -55,21 +30,49 @@ const getInvoices = async (req, res) => {
       }
     });
 
-    const endTime = new Date();
-
-    console.log(
-      `[${endTime.toISOString()}] - Successfully fetched invoices. Response time: ${
-        endTime - startTime
-      }ms`
-    );
-
     res.status(200).json(response?.data);
   } catch (error) {
-    const endTime = new Date();
+    if (error.code === "ECONNABORTED") {
+      res.status(500).json({ code: "003", message: "Request timeout" });
+    } else {
+      res.status(500).json({ message: "Error getting invoices" });
+    }
+  }
+};
 
-    console.error(`Response time: ${endTime - startTime}ms`);
-    console.error("error: ", error);
-    res.status(500).json({ message: "Error getting invoices" });
+const getAuth = async (req, res) => {
+  try {
+    const { serviceId, courseId, authToken } = req.body;
+
+    const magiUrl = "https://test-magi2.magi.auone.jp/vtkt/authorization2";
+
+    const postData = `vtkt=${authToken}&sid=${serviceId}&cid=${courseId}`;
+
+    const response = await axios.post(magiUrl, postData, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded; charset=US-ASCII",
+        Host: "test-magi2.magi.auone.jp",
+        Connection: "close"
+      }
+    });
+
+    if (response.status === 200) {
+      const data = response.data.split("\n").reduce((prev, curr) => {
+        const [key, value] = curr.split("=");
+        prev[key] = value;
+        return prev;
+      }, {});
+
+      res.json(data);
+    } else {
+      res.status(response.status).json({
+        message: "Error from magi2.magi.auone.jp",
+        status: response.status
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -77,7 +80,6 @@ const postInvoice = async (req, res) => {
   try {
     const { serviceId, systemAuId, invoiceList } = req.body;
 
-    // Validate the request data
     if (
       typeof serviceId === "undefined" ||
       typeof systemAuId === "undefined" ||
@@ -86,7 +88,6 @@ const postInvoice = async (req, res) => {
       return res.status(400).json({ message: "Invalid request data" });
     }
 
-    // Make a POST request to the external service
     const response = await axios.post(
       `${baseURL}${endpointPath}`,
       {
@@ -99,19 +100,28 @@ const postInvoice = async (req, res) => {
           Host: headerHost,
           "Accept-Charset": "UTF-8",
           "Content-Type": "application/json; charset=UTF-8"
-        }
+        },
+        timeout: 60000
       }
     );
 
     if (response?.status === 200) {
+      logger.info("請求書の送信に成功しました");
+
       return res.status(201).json(response?.data);
     } else {
+      logger.error("外部サービスからのエラー");
+
       return res.status(500).json({
         message: "Error from external service"
       });
     }
   } catch (error) {
-    return res.status(500).json({ message: "Error checking invoice" });
+    if (error.code === "ECONNABORTED") {
+      res.status(500).json({ code: "003", message: "Request timeout" });
+    } else {
+      res.status(500).json({ message: "Error getting invoice" });
+    }
   }
 };
 
@@ -129,7 +139,6 @@ const getInvoicePdf = async (req, res) => {
       });
     }
 
-    // Make a GET request to the external service
     const response = await axios.get(`${baseURL}/invoices/pdf`, {
       params: {
         serviceId,
@@ -141,14 +150,15 @@ const getInvoicePdf = async (req, res) => {
         Host: headerHost,
         "Accept-Charset": "UTF-8"
       },
-      responseType: "stream"
+      responseType: "stream",
+      timeout: 60000
     });
 
-    // Forward the response from the external service to the client
     if (response.status === 200) {
+      logger.info("請求書のPDF生成に成功しました");
+
       res.setHeader("Content-Type", response.headers["content-type"]);
 
-      // Forward content-disposition headers if present
       if (response.headers["content-disposition"]) {
         res.setHeader(
           "Content-Disposition",
@@ -159,6 +169,8 @@ const getInvoicePdf = async (req, res) => {
       // Pipe the stream to the client
       response.data.pipe(res);
     } else {
+      logger.error("外部サービスからのエラー");
+
       return res.status(500).json({
         header: {
           reasoncode: 1,
@@ -167,18 +179,17 @@ const getInvoicePdf = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      header: {
-        reasoncode: 1,
-        message: "Error generating invoice PDF"
-      }
-    });
+    if (error.code === "ECONNABORTED") {
+      res.status(500).json({ code: "003", message: "Request timeout" });
+    } else {
+      res.status(500).json({ message: "Error getting invoices" });
+    }
   }
 };
 
 module.exports = {
   getInvoices,
   getInvoicePdf,
+  getAuth,
   postInvoice
 };

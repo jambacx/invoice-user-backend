@@ -6,7 +6,6 @@ const ip = require("request-ip");
 const cookieMiddleware = require("./Middlewares/Cookie.middleware");
 
 const logger = require("./lib/logger");
-// const initDB = require("./initDB");
 const Routes = require("./Routes");
 require("dotenv").config();
 
@@ -22,10 +21,8 @@ require("dotenv").config();
   app.use(ip.mw());
   app.use(cookieMiddleware);
 
-  // Router Level Middlewares
   app.use("/api", Routes);
 
-  //404 handler and pass to error handler
   app.use(() => {
     throw {
       status: 404,
