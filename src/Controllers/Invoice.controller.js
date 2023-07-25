@@ -1,6 +1,9 @@
 const axios = require("axios");
 const logger = require("../lib/logger");
-const qs = require("qs");
+
+const { checkUserLimit } = require("../lib/limitation");
+const { removeUser } = require("../lib/redisClient");
+const { log } = require("winston");
 
 const baseURL = process.env.AIR_SERVER || "http://172.30.155.46:11080";
 const headerHost = process.env.HOST_HEADER || "172.30.155.46";
@@ -17,6 +20,7 @@ const getInvoices = async (req, res) => {
 
   try {
     const { serviceId, systemAuId, startDate, endDate } = req.query;
+
     const response = await axios.get(`${baseURL}${endpointPath}`, {
       params: {
         serviceId,
@@ -30,7 +34,7 @@ const getInvoices = async (req, res) => {
       }
     });
 
-    res.status(200).json(response?.data);
+    res.status(200).json({ data: response?.data, header: response?.headers });
   } catch (error) {
     if (error.code === "ECONNABORTED") {
       res.status(500).json({ code: "003", message: "Request timeout" });
@@ -76,9 +80,32 @@ const getAuth = async (req, res) => {
   }
 };
 
+const checkCustomerRequest = async (sequence, data, res) => {
+  const available = await checkUserLimit(sequence, data);
+
+  if (!available) {
+    return res
+      .status(400)
+      .json({ errorCode: 403, message: "User access is denied." });
+  }
+};
+
+const logout = (req, res) => {
+  const { systemAuId } = req.body;
+
+  if (!systemAuId) {
+    return next;
+  }
+
+  removeUser(systemAuId);
+};
+
 const postInvoice = async (req, res) => {
   try {
     const { serviceId, systemAuId, invoiceList } = req.body;
+
+    const userKey = `${systemAuId}`;
+    checkCustomerRequest(userKey, "", res);
 
     if (
       typeof serviceId === "undefined" ||
@@ -108,7 +135,9 @@ const postInvoice = async (req, res) => {
     if (response?.status === 200) {
       logger.info("請求書の送信に成功しました");
 
-      return res.status(201).json(response?.data);
+      return res
+        .status(201)
+        .json({ data: response?.data, header: response?.headers });
     } else {
       logger.error("外部サービスからのエラー");
 
@@ -129,7 +158,8 @@ const getInvoicePdf = async (req, res) => {
   try {
     const { serviceId, systemAuId, invoiceId } = req.query;
 
-    // Validate input parameters
+    const userKey = `${systemAuId}`;
+    checkCustomerRequest(userKey, "", res);
     if (!serviceId || !systemAuId || !invoiceId || isNaN(invoiceId)) {
       return res.status(400).json({
         header: {
@@ -155,18 +185,10 @@ const getInvoicePdf = async (req, res) => {
     });
 
     if (response.status === 200) {
-      logger.info("請求書のPDF生成に成功しました");
-
+      console.log(response.headers);
       res.setHeader("Content-Type", response.headers["content-type"]);
+      res.setHeader("x-resultcode", response.headers["x-resultcode"]);
 
-      if (response.headers["content-disposition"]) {
-        res.setHeader(
-          "Content-Disposition",
-          response.headers["content-disposition"]
-        );
-      }
-
-      // Pipe the stream to the client
       response.data.pipe(res);
     } else {
       logger.error("外部サービスからのエラー");
@@ -191,5 +213,6 @@ module.exports = {
   getInvoices,
   getInvoicePdf,
   getAuth,
-  postInvoice
+  postInvoice,
+  logout
 };

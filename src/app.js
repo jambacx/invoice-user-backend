@@ -3,6 +3,9 @@ const cors = require("cors");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const ip = require("request-ip");
+
+const { client } = require("./lib/redisClient");
+
 const cookieMiddleware = require("./Middlewares/Cookie.middleware");
 
 const logger = require("./lib/logger");
@@ -10,6 +13,8 @@ const Routes = require("./Routes");
 require("dotenv").config();
 
 (async () => {
+  await client.connect();
+
   const app = express();
 
   app.use(morgan("dev"));
@@ -31,7 +36,6 @@ require("dotenv").config();
     };
   });
 
-  //Error handler
   app.use((err, req, res, next) => {
     logger.debug(err.message || err);
 

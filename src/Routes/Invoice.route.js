@@ -9,6 +9,8 @@ router.post("/invoices", controller.postInvoice);
 
 router.post("/invoices/auth", controller.getAuth);
 
+router.post("/invoices/logout", controller.logout);
+
 router.get("/invoices/pdf", controller.getInvoicePdf);
 
 module.exports = router;
