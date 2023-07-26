@@ -5,3 +5,6 @@
 - 0 0 1 * * curl -s GET localhost:3000/api/archive/monthly
 - 0 0 1 1 * curl -s GET localhost:3000/api/archive/yearly
 - 0 0 * * * curl -s GET localhost:3000/api/analytic/daily
+
+
+curl -s GET localhost:3030/api/archive/daily
