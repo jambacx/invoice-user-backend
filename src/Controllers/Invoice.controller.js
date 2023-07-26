@@ -21,6 +21,9 @@ const getInvoices = async (req, res) => {
   try {
     const { serviceId, systemAuId, startDate, endDate } = req.query;
 
+    const userKey = `${systemAuId}`;
+    checkCustomerRequest(userKey, "", res);
+
     const response = await axios.get(`${baseURL}${endpointPath}`, {
       params: {
         serviceId,
