@@ -2,12 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
+const session = require("express-session");
 const ip = require("request-ip");
 const uuid = require("uuid").v4;
-const session = require("express-session");
-
 const { client } = require("./lib/redisClient");
-
 const cookieMiddleware = require("./Middlewares/Cookie.middleware");
 const sessionMiddleware = require("./Middlewares/session");
 
@@ -25,7 +23,6 @@ require("dotenv").config();
   app.use(express.json());
   app.use(cookieParser());
   app.use(express.urlencoded({ extended: true }));
-
   app.use(
     session({
       name: "sid",
@@ -47,8 +44,6 @@ require("dotenv").config();
   app.use(ip.mw());
   app.use(sessionMiddleware, cookieMiddleware);
 
-  app.use(cookieMiddleware);
-
   app.use("/api", Routes);
 
   app.use(() => {
@@ -61,6 +56,11 @@ require("dotenv").config();
 
   app.use((err, req, res, next) => {
     logger.debug(err.message || err);
+
+    if (err.code === 11000) {
+      err.message = "duplicate key error collection";
+      err.statusCode = 400;
+    }
 
     res.status(err.status || 500).send({
       code: err.code || 500,

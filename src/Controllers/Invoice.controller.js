@@ -1,9 +1,8 @@
 const axios = require("axios");
-const logger = require("../lib/logger");
+const { logAccess, getMessageId } = require("../lib/userLog");
 
 const { checkUserLimit } = require("../lib/limitation");
 const { removeUser } = require("../lib/redisClient");
-const { log } = require("winston");
 
 const baseURL = process.env.AIR_SERVER || "http://172.30.155.46:11080";
 const headerHost = process.env.HOST_HEADER || "172.30.155.46";
@@ -11,18 +10,13 @@ const headerHost = process.env.HOST_HEADER || "172.30.155.46";
 const endpointPath = "/invoices";
 
 const getInvoices = async (req, res) => {
-  const startTime = new Date();
-  logger.info(
-    `[${startTime.toISOString()}] - 請求書の情報取得要求を受け取りました。パラメータ：${JSON.stringify(
-      req.query
-    )}`
-  );
-
   try {
     const { serviceId, systemAuId, startDate, endDate } = req.query;
 
     const userKey = `${systemAuId}`;
     checkCustomerRequest(userKey, "", res);
+
+    logAccess(req.session.id, "U000007", serviceId, systemAuId, "-");
 
     const response = await axios.get(`${baseURL}${endpointPath}`, {
       params: {
@@ -36,6 +30,13 @@ const getInvoices = async (req, res) => {
         "Accept-Charset": "UTF-8"
       }
     });
+
+    const resultCode = response.headers["x-resultcode"] || "-";
+    const reasonCode = response.data.reasoncode || "-";
+
+    const resultString = `X-Resultcode:${resultCode}/responsecode:${reasonCode}`;
+    const messageId = getMessageId(1, resultCode, reasonCode);
+    logAccess(req.session.id, messageId, serviceId, systemAuId, resultString);
 
     res.status(200).json({ data: response?.data, header: response?.headers });
   } catch (error) {
@@ -71,6 +72,8 @@ const getAuth = async (req, res) => {
       }, {});
 
       res.json(data);
+
+      logAccess(req.session.id, messageId, serviceId, systemAuId, "-");
     } else {
       res.status(response.status).json({
         message: "Error from magi2.magi.auone.jp",
@@ -78,6 +81,7 @@ const getAuth = async (req, res) => {
       });
     }
   } catch (error) {
+    logAccess(req.session.id, messageId, serviceId, systemAuId, "-");
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
   }
@@ -136,14 +140,17 @@ const postInvoice = async (req, res) => {
     );
 
     if (response?.status === 200) {
-      logger.info("請求書の送信に成功しました");
+      const resultCode = response.headers["x-resultcode"] || "-";
+      const reasonCode = response.data.reasoncode || "-";
+
+      const resultString = `X-Resultcode:${resultCode}/responsecode:${reasonCode}`;
+      const messageId = getMessageId(2, resultCode, reasonCode);
+      logAccess(req.session.id, messageId, serviceId, systemAuId, resultString);
 
       return res
         .status(201)
         .json({ data: response?.data, header: response?.headers });
     } else {
-      logger.error("外部サービスからのエラー");
-
       return res.status(500).json({
         message: "Error from external service"
       });
@@ -188,7 +195,13 @@ const getInvoicePdf = async (req, res) => {
     });
 
     if (response.status === 200) {
-      console.log(response.headers);
+      const resultCode = response.headers["x-resultcode"] || "-";
+      const reasonCode = response.data.reasoncode || "-";
+
+      const resultString = `X-Resultcode:${resultCode}/responsecode:${reasonCode}`;
+      const messageId = getMessageId(3, resultCode, reasonCode);
+      logAccess(req.session.id, messageId, serviceId, systemAuId, resultString);
+
       res.setHeader("Content-Type", response.headers["content-type"]);
       res.setHeader("x-resultcode", response.headers["x-resultcode"]);
 
