@@ -2,12 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
+const session = require("express-session");
 const ip = require("request-ip");
 const uuid = require("uuid").v4;
-const session = require("express-session");
-
 const { client } = require("./lib/redisClient");
-
 const cookieMiddleware = require("./Middlewares/Cookie.middleware");
 const sessionMiddleware = require("./Middlewares/session");
 
@@ -19,12 +17,12 @@ require("dotenv").config();
   await client.connect();
 
   const app = express();
+
   app.use(morgan("dev"));
   app.use(cors({}));
   app.use(express.json());
   app.use(cookieParser());
   app.use(express.urlencoded({ extended: true }));
-
   app.use(
     session({
       name: "sid",
@@ -46,15 +44,13 @@ require("dotenv").config();
   app.use(ip.mw());
   app.use(sessionMiddleware, cookieMiddleware);
 
-  app.use(cookieMiddleware);
-
   app.use("/api", Routes);
 
   app.use(() => {
     throw {
       status: 404,
       code: 404,
-      message: "Not Found",
+      message: "Not Found"
     };
   });
 
@@ -68,7 +64,7 @@ require("dotenv").config();
 
     res.status(err.status || 500).send({
       code: err.code || 500,
-      message: err.message || "Unhandling Error!",
+      message: err.message || "Unhandling Error!"
     });
   });
 
