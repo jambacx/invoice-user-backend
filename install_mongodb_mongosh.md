@@ -15,7 +15,7 @@ if you want to check mongodb logs run the following command in console.
 
 - mongod
 
-# Intall Mongosh
+# Install Mongosh
 
 - tar -xvf mongosh-1.6.2-linux-x64.tar -C /opt/mongosh-1.6.2
 - cd /opt/mongosh-1.6.2

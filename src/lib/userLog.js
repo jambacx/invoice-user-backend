@@ -1,13 +1,20 @@
 const logger = require("./logger");
 const { userLogEntries } = require("../Constants/messageId");
 
-
 function getLogEntry(messageId) {
   return userLogEntries.find((entry) => entry.messageId === messageId);
 }
 
 const getMessageId = (status, resultCode, reasonCode) => {
   let messageId;
+
+  if (typeof resultCode !== "string") {
+    resultCode = resultCode.toString();
+  }
+
+  if (typeof reasonCode !== "string") {
+    reasonCode = reasonCode.toString();
+  }
 
   switch (status) {
     case 1:
@@ -34,10 +41,11 @@ const getMessageId = (status, resultCode, reasonCode) => {
       } else {
         messageId = "U000015";
       }
+
       break;
 
     default:
-      messageId = "U000021";
+      messageId = "U000027";
   }
 
   return messageId;
