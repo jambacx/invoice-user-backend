@@ -34,7 +34,7 @@ const getInvoices = async (req, res) => {
     const resultCode = response.headers["x-resultcode"] || "-";
     const reasonCode = response.data.reasoncode || "-";
 
-    const resultString = `X-Resultcode:${resultCode}/responsecode:${reasonCode}`;
+    const resultString = `X-Resultcode:${resultCode}/reasoncode:${reasonCode}`;
     const messageId = getMessageId(1, resultCode, reasonCode);
     logAccess(req.session.id, messageId, serviceId, systemAuId, resultString);
 
@@ -143,7 +143,7 @@ const postInvoice = async (req, res) => {
       const resultCode = response.headers["x-resultcode"] || "-";
       const reasonCode = response.data.reasoncode || "-";
 
-      const resultString = `X-Resultcode:${resultCode}/responsecode:${reasonCode}`;
+      const resultString = `X-Resultcode:${resultCode}/reasoncode:${reasonCode}`;
       const messageId = getMessageId(2, resultCode, reasonCode);
       logAccess(req.session.id, messageId, serviceId, systemAuId, resultString);
 
@@ -198,7 +198,7 @@ const getInvoicePdf = async (req, res) => {
       const resultCode = response.headers["x-resultcode"] || "-";
       const reasonCode = response.data.reasoncode || "-";
 
-      const resultString = `X-Resultcode:${resultCode}/responsecode:${reasonCode}`;
+      const resultString = `X-Resultcode:${resultCode}/reasoncode:${reasonCode}`;
       const messageId = getMessageId(3, resultCode, reasonCode);
       logAccess(req.session.id, messageId, serviceId, systemAuId, resultString);
 

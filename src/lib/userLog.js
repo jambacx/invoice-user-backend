@@ -58,7 +58,7 @@ function logAccess(
 
   const { request, level } = logEntryData;
 
-  const logEntry = `${transactionId} , ${messageId} , ${serviceId} , ${systemAuId} , ${level} , ${request}, ${result}`;
+  const logEntry = `${transactionId},${messageId},${serviceId},${systemAuId},${level},${request},${result}`;
   logger.info(logEntry);
 }
 
