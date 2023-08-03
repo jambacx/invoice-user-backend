@@ -9,8 +9,8 @@ const respCode = Object.freeze({
   unArchived: "UA",
   error: "E"
 });
-
-const logDir = process.env.access_log_dir;
+const { accessLogDir } = require("../Constants/dir");
+const logDir = accessLogDir;
 
 const daily = (req, res, next) => {
   try {
