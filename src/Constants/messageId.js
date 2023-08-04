@@ -43,7 +43,29 @@ const userLogEntries = [
   },
   { messageId: "U000018", request: "request of logout", level: "I" },
   { messageId: "U000019", request: "-", level: "W" },
-  { messageId: "U000020", request: "request of auID login", level: "E" }
+  { messageId: "U000020", request: "request of auID login", level: "E" },
+  { messageId: "U000021", request: "Session timed out", level: "E" },
+  { messageId: "U000022", request: "A system error has occurred", level: "E" },
+  {
+    messageId: "U000023",
+    request: "It is currently under maintenance and cannot be used",
+    level: "E"
+  },
+  {
+    messageId: "U000024",
+    request: "Trouble connecting to the screen",
+    level: "E"
+  },
+  {
+    messageId: "U000025",
+    request: "Your name is not registered in your au ID",
+    level: "E"
+  },
+  {
+    messageId: "U000026",
+    request: "We are unable to retrieve your billing data",
+    level: "E"
+  }
 ];
 
 module.exports = {

@@ -8,6 +8,14 @@ function getLogEntry(messageId) {
 const getMessageId = (status, resultCode, reasonCode) => {
   let messageId;
 
+  if (typeof resultCode !== "string") {
+    resultCode = resultCode.toString();
+  }
+
+  if (typeof reasonCode !== "string") {
+    reasonCode = reasonCode.toString();
+  }
+
   switch (status) {
     case 1:
       if (resultCode === "0" && reasonCode === "0") {
@@ -33,10 +41,11 @@ const getMessageId = (status, resultCode, reasonCode) => {
       } else {
         messageId = "U000015";
       }
+
       break;
 
     default:
-      messageId = "U000021";
+      messageId = "U000027";
   }
 
   return messageId;

@@ -30,9 +30,9 @@ const getInvoices = async (req, res) => {
         "Accept-Charset": "UTF-8"
       }
     });
-
+    console.log("response: ", response);
     const resultCode = response.headers["x-resultcode"] || "-";
-    const reasonCode = response.data.reasoncode || "-";
+    const reasonCode = response.data?.header?.reasoncode || "-";
 
     const resultString = `X-Resultcode:${resultCode}/reasoncode:${reasonCode}`;
     const messageId = getMessageId(1, resultCode, reasonCode);
@@ -43,6 +43,7 @@ const getInvoices = async (req, res) => {
     if (error.code === "ECONNABORTED") {
       res.status(500).json({ code: "003", message: "Request timeout" });
     } else {
+      console.log(error);
       res.status(500).json({ message: "Error getting invoices" });
     }
   }
@@ -141,7 +142,7 @@ const postInvoice = async (req, res) => {
 
     if (response?.status === 200) {
       const resultCode = response.headers["x-resultcode"] || "-";
-      const reasonCode = response.data.reasoncode || "-";
+      const reasonCode = response.data?.header?.reasoncode || "-";
 
       const resultString = `X-Resultcode:${resultCode}/reasoncode:${reasonCode}`;
       const messageId = getMessageId(2, resultCode, reasonCode);
@@ -196,7 +197,7 @@ const getInvoicePdf = async (req, res) => {
 
     if (response.status === 200) {
       const resultCode = response.headers["x-resultcode"] || "-";
-      const reasonCode = response.data.reasoncode || "-";
+      const reasonCode = response.data?.header?.reasoncode || "-";
 
       const resultString = `X-Resultcode:${resultCode}/reasoncode:${reasonCode}`;
       const messageId = getMessageId(3, resultCode, reasonCode);
@@ -225,10 +226,48 @@ const getInvoicePdf = async (req, res) => {
   }
 };
 
+const uiLogger = async (req, res) => {
+  try {
+    let { serviceId, systemAuId, message, resultString } = req.query;
+
+    if (!serviceId) {
+      serviceId = "-";
+    }
+
+    if (!systemAuId) {
+      systemAuId = "-";
+    }
+
+    if (!message) {
+      message = "-";
+    }
+
+    if (!resultString) {
+      resultString = "-";
+    }
+
+    const messageId = `U0000${message}`;
+
+    logAccess(req.session.id, messageId, serviceId, systemAuId, resultString);
+
+    res.status(200).json({
+      success: true,
+      message: "Log successfully writed"
+    });
+  } catch (error) {
+    if (error.code === "ECONNABORTED") {
+      res.status(500).json({ code: "003", message: "Request timeout" });
+    } else {
+      res.status(500).json({ message: "Error getting invoices" });
+    }
+  }
+};
+
 module.exports = {
   getInvoices,
   getInvoicePdf,
   getAuth,
   postInvoice,
+  uiLogger,
   logout
 };
