@@ -4,19 +4,21 @@ const { logAccess, getMessageId } = require("../lib/userLog");
 const { checkUserLimit } = require("../lib/limitation");
 const { removeUser } = require("../lib/redisClient");
 
+const { mapping } = require("../lib/mapping");
+
 const baseURL = process.env.AIR_SERVER || "http://172.30.155.46:11080";
 const headerHost = process.env.HOST_HEADER || "172.30.155.46";
 
 const endpointPath = "/invoices";
 
 const getInvoices = async (req, res) => {
+  const startTime = new Date();
+
   try {
     const { serviceId, systemAuId, startDate, endDate } = req.query;
 
     const userKey = `${systemAuId}`;
     checkCustomerRequest(userKey, "", res);
-
-    logAccess(req.session.id, "U000007", serviceId, systemAuId, "-");
 
     const response = await axios.get(`${baseURL}${endpointPath}`, {
       params: {
@@ -30,13 +32,20 @@ const getInvoices = async (req, res) => {
         "Accept-Charset": "UTF-8"
       }
     });
-    console.log("response: ", response);
+
     const resultCode = response.headers["x-resultcode"] || "-";
     const reasonCode = response.data?.header?.reasoncode;
 
     const resultString = `X-Resultcode:${resultCode}/reasoncode:${reasonCode}`;
     const messageId = getMessageId(1, resultCode, reasonCode);
-    logAccess(req.session.id, messageId, serviceId, systemAuId, resultString);
+    logAccess(
+      req.session.id,
+      messageId,
+      serviceId,
+      systemAuId,
+      resultString,
+      startTime
+    );
 
     res.status(200).json({ data: response?.data, header: response?.headers });
   } catch (error) {
@@ -106,6 +115,8 @@ const logout = (req, res) => {
 };
 
 const postInvoice = async (req, res) => {
+  const startTime = new Date();
+
   try {
     const { serviceId, systemAuId, invoiceList } = req.body;
 
@@ -140,10 +151,20 @@ const postInvoice = async (req, res) => {
     if (response?.status === 200) {
       const resultCode = response.headers["x-resultcode"] || "-";
       const reasonCode = response.data?.header?.reasoncode;
-
+      console.log("========2=============");
+      console.log(resultCode);
+      console.log(reasonCode);
+      console.log("=====================");
       const resultString = `X-Resultcode:${resultCode}/reasoncode:${reasonCode}`;
       const messageId = getMessageId(2, resultCode, reasonCode);
-      logAccess(req.session.id, messageId, serviceId, systemAuId, resultString);
+      logAccess(
+        req.session.id,
+        messageId,
+        serviceId,
+        systemAuId,
+        resultString,
+        startTime
+      );
 
       return res
         .status(201)
@@ -163,6 +184,8 @@ const postInvoice = async (req, res) => {
 };
 
 const getInvoicePdf = async (req, res) => {
+  const startTime = new Date();
+
   try {
     const { serviceId, systemAuId, invoiceId } = req.query;
 
@@ -181,8 +204,7 @@ const getInvoicePdf = async (req, res) => {
       params: {
         serviceId,
         systemAuId,
-        invoiceId,
-        limit: 500
+        invoiceId
       },
       headers: {
         Host: headerHost,
@@ -194,11 +216,17 @@ const getInvoicePdf = async (req, res) => {
 
     if (response.status === 200) {
       const resultCode = response.headers["x-resultcode"] || "-";
-      const reasonCode = response.data?.header?.reasoncode;
-
+      const reasonCode = response.data?.header?.reasoncode || "-";
       const resultString = `X-Resultcode:${resultCode}/reasoncode:${reasonCode}`;
       const messageId = getMessageId(3, resultCode, reasonCode);
-      logAccess(req.session.id, messageId, serviceId, systemAuId, resultString);
+      logAccess(
+        req.session.id,
+        messageId,
+        serviceId,
+        systemAuId,
+        resultString,
+        startTime
+      );
 
       res.setHeader("Content-Type", response.headers["content-type"]);
       res.setHeader("x-resultcode", response.headers["x-resultcode"]);
@@ -225,7 +253,23 @@ const getInvoicePdf = async (req, res) => {
 
 const uiLogger = async (req, res) => {
   try {
-    let { serviceId, systemAuId, message, resultString } = req.query;
+    let { serviceId, systemAuId, message } = req.query;
+
+    if (message && message.startsWith("/")) {
+      message = message.substring(1);
+    }
+
+    serviceId = String(serviceId);
+    const mappingForService = mapping[serviceId];
+
+    if (!mappingForService || !mappingForService[message]) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid serviceId or message"
+      });
+    }
+
+    const { messageId, resultString } = mappingForService[message];
 
     if (!serviceId) {
       serviceId = "-";
@@ -234,16 +278,6 @@ const uiLogger = async (req, res) => {
     if (!systemAuId) {
       systemAuId = "-";
     }
-
-    if (!message) {
-      message = "-";
-    }
-
-    if (!resultString) {
-      resultString = "-";
-    }
-
-    const messageId = `U0000${message}`;
 
     logAccess(req.session.id, messageId, serviceId, systemAuId, resultString);
 
