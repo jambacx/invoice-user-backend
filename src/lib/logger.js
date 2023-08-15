@@ -13,7 +13,7 @@ const fileTransport = new winston.transports.DailyRotateFile({
   level: "info",
   format: winston.format.combine(
     winston.format.colorize(),
-    winston.format.timestamp({ format: "YYYY-MM-DD,HH:mm:ss" }),
+    winston.format.timestamp({ format: "YYYY-MM-DD,HH:mm:ss.SSS" }),
     winston.format.printf((info) => `${info.timestamp},${info.message}`)
   )
 });

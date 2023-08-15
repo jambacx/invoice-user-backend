@@ -1,5 +1,6 @@
 const logger = require("./logger");
 const { userLogEntries } = require("../Constants/messageId");
+const moment = require("moment");
 
 function getLogEntry(messageId) {
   return userLogEntries.find((entry) => entry.messageId === messageId);
@@ -56,7 +57,8 @@ function logAccess(
   messageId,
   serviceId = "-",
   systemAuId = "-",
-  result = "-"
+  result = "-",
+  startTime = null
 ) {
   const logEntryData = getLogEntry(messageId);
 
@@ -65,9 +67,44 @@ function logAccess(
     return;
   }
 
+  const responseTimeMessageIds = new Set([
+    "T000003",
+    "T000004",
+    "T000005",
+    "T000006",
+    "T000007",
+    "T000008",
+    "T000009",
+    "T000010",
+    "T000011",
+    "T000012",
+    "T000013",
+    "T000014",
+    "T000015",
+    "T000016",
+    "T000018",
+    "T000019"
+  ]);
+
+  let responseTime = "-";
+  if (responseTimeMessageIds.has(messageId) && startTime) {
+    const endTime = moment();
+    const duration = moment.duration(endTime.diff(moment(startTime)));
+    responseTime = `${duration.hours().toString().padStart(2, "0")}:${duration
+      .minutes()
+      .toString()
+      .padStart(2, "0")}:${duration
+      .seconds()
+      .toString()
+      .padStart(2, "0")}.${duration
+      .milliseconds()
+      .toString()
+      .padStart(3, "0")}`;
+  }
+
   const { request, level } = logEntryData;
 
-  const logEntry = `${transactionId},${messageId},${serviceId},${systemAuId},${level},${request},${result}`;
+  const logEntry = `${transactionId},${messageId},${serviceId},${systemAuId},${level},${request},${result},${responseTime}`;
   logger.info(logEntry);
 }
 

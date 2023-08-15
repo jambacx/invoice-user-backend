@@ -33,7 +33,7 @@ const userLogEntries = [
   },
   {
     messageId: "U000016",
-    request: "request of transtion to auID member information",
+    request: "request of logout",
     level: "I"
   },
   {
@@ -43,27 +43,94 @@ const userLogEntries = [
   },
   { messageId: "U000018", request: "request of logout", level: "I" },
   { messageId: "U000019", request: "-", level: "W" },
-  { messageId: "U000020", request: "request of auID login", level: "E" },
-  { messageId: "U000021", request: "Session timed out", level: "E" },
-  { messageId: "U000022", request: "A system error has occurred", level: "E" },
+  {
+    messageId: "U000020",
+    request: "request of invoice screen transition",
+    level: "I"
+  },
+  {
+    messageId: "U000021",
+    request: "request of invoice screen transition",
+    level: "I"
+  },
+  {
+    messageId: "U000022",
+    request: "request of invoice screen transition",
+    level: "I"
+  },
   {
     messageId: "U000023",
-    request: "It is currently under maintenance and cannot be used",
+    request: "request of session timeout screen transtion",
     level: "E"
   },
   {
     messageId: "U000024",
-    request: "Trouble connecting to the screen",
+    request: "request of system error screen transtion",
     level: "E"
   },
   {
     messageId: "U000025",
-    request: "Your name is not registered in your au ID",
+    request: "request of maintenance screen transtion",
     level: "E"
   },
   {
     messageId: "U000026",
-    request: "We are unable to retrieve your billing data",
+    request: "request of limited connection screen transtion",
+    level: "E"
+  },
+  {
+    messageId: "U000027",
+    request: "request of costumer name not found screen transtion",
+    level: "E"
+  },
+  {
+    messageId: "U000028",
+    request: "request of pdf file limited screen transtion",
+    level: "E"
+  },
+  {
+    messageId: "U000029",
+    request: "request of invoice screen transition",
+    level: "I"
+  },
+  {
+    messageId: "U000030",
+    request: "request of invoice screen transition",
+    level: "I"
+  },
+  {
+    messageId: "U000031",
+    request: "request of invoice screen transition",
+    level: "I"
+  },
+  {
+    messageId: "U000032",
+    request: "request of session timeout screen transtion",
+    level: "E"
+  },
+  {
+    messageId: "U000033",
+    request: "request of system error screen transtion",
+    level: "E"
+  },
+  {
+    messageId: "U000034",
+    request: "request of maintenance screen transtion",
+    level: "E"
+  },
+  {
+    messageId: "U000035",
+    request: "request of limited connection screen transtion",
+    level: "E"
+  },
+  {
+    messageId: "U000036",
+    request: "request of costumer name not found screen transtion",
+    level: "E"
+  },
+  {
+    messageId: "U000037",
+    request: "request of pdf file limited screen transtion",
     level: "E"
   }
 ];
