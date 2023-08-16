@@ -58,9 +58,9 @@ const getInvoices = async (req, res) => {
 };
 
 const getAuth = async (req, res) => {
+  const startTime = new Date();
   try {
     const { serviceId, courseId, authToken } = req.body;
-
     const magiUrl = "https://test-magi2.magi.auone.jp/vtkt/authorization2";
 
     const postData = `vtkt=${authToken}&sid=${serviceId}&cid=${courseId}`;
@@ -81,8 +81,17 @@ const getAuth = async (req, res) => {
       }, {});
 
       res.json(data);
-
-      logAccess(req.session.id, messageId, serviceId, systemAuId, "-");
+      const systemAuId = data.lid;
+      const messageId = getMessageId(4, "-", "-");
+      const resultString = "login success";
+      logAccess(
+        req.session.id,
+        messageId,
+        serviceId,
+        systemAuId,
+        resultString,
+        startTime
+      );
     } else {
       res.status(response.status).json({
         message: "Error from magi2.magi.auone.jp",
@@ -90,7 +99,17 @@ const getAuth = async (req, res) => {
       });
     }
   } catch (error) {
-    logAccess(req.session.id, messageId, serviceId, systemAuId, "-");
+    const messageId = getMessageId(4, "-", "1");
+    const resultString = `err:${error}`;
+    const systemAuId = "-";
+    logAccess(
+      req.session.id,
+      messageId,
+      serviceId,
+      systemAuId,
+      resultString,
+      startTime
+    );
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
   }

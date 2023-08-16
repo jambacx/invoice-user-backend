@@ -42,9 +42,15 @@ const getMessageId = (status, resultCode, reasonCode) => {
       } else {
         messageId = "U000015";
       }
-
       break;
-
+    case 4:
+      if (resultCode === "-" && reasonCode === "-") {
+        messageId = "U000005";
+      } 
+      else {
+        messageId = "U000006";
+      }
+      break;
     default:
       messageId = "U000027";
   }
@@ -68,22 +74,22 @@ function logAccess(
   }
 
   const responseTimeMessageIds = new Set([
-    "T000003",
-    "T000004",
-    "T000005",
-    "T000006",
-    "T000007",
-    "T000008",
-    "T000009",
-    "T000010",
-    "T000011",
-    "T000012",
-    "T000013",
-    "T000014",
-    "T000015",
-    "T000016",
-    "T000018",
-    "T000019"
+    "U000003",
+    "U000004",
+    "U000005",
+    "U000006",
+    "U000007",
+    "U000008",
+    "U000009",
+    "U000010",
+    "U000011",
+    "U000012",
+    "U000013",
+    "U000014",
+    "U000015",
+    "U000016",
+    "U000018",
+    "U000019"
   ]);
 
   let responseTime = "-";
