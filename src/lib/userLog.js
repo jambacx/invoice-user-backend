@@ -44,9 +44,13 @@ const getMessageId = (status, resultCode, reasonCode) => {
       }
       break;
     case 4:
-      if (resultCode === "-" && reasonCode === "-") {
+      if (resultCode === "0" && reasonCode === "1") {
+        messageId = "U000003";
+      } else if (resultCode === "0" && reasonCode === "0") {
+        messageId = "U000004";
+      } else if (resultCode === "1" && reasonCode === "1") {
         messageId = "U000005";
-      } 
+      }
       else {
         messageId = "U000006";
       }

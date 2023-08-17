@@ -1,3 +1,4 @@
+require('dotenv').config();
 const axios = require("axios");
 const { logAccess, getMessageId } = require("../lib/userLog");
 
@@ -61,6 +62,31 @@ const getAuth = async (req, res) => {
   const startTime = new Date();
   try {
     const { serviceId, courseId, authToken } = req.body;
+    if(authToken) {
+      const systemAuId = "-";
+      const messageId = getMessageId(4, "0", "1");
+      const resultString = "login success";
+      logAccess(
+        req.session.id,
+        messageId,
+        serviceId,
+        systemAuId,
+        resultString,
+        startTime
+      );
+    } else {
+      const systemAuId = "-";
+      const messageId = getMessageId(4, "0", "0");
+      const resultString = "login fail";
+      logAccess(
+        req.session.id,
+        messageId,
+        serviceId,
+        systemAuId,
+        resultString,
+        startTime
+      );
+    }
     const magiUrl = "https://test-magi2.magi.auone.jp/vtkt/authorization2";
 
     const postData = `vtkt=${authToken}&sid=${serviceId}&cid=${courseId}`;
@@ -82,7 +108,7 @@ const getAuth = async (req, res) => {
 
       res.json(data);
       const systemAuId = data.lid;
-      const messageId = getMessageId(4, "-", "-");
+      const messageId = getMessageId(4, "1", "1");
       const resultString = "login success";
       logAccess(
         req.session.id,
@@ -99,7 +125,7 @@ const getAuth = async (req, res) => {
       });
     }
   } catch (error) {
-    const messageId = getMessageId(4, "-", "1");
+    const messageId = getMessageId(4, "1", "0");
     const resultString = `err:${error}`;
     const systemAuId = "-";
     logAccess(
